@@ -1,0 +1,8 @@
+name = Whywebs Drupal Module Builder
+description = Whywebs Drupal Module Builder, build your module without the need for external softwares.
+package = WhyWebs
+core = 7.x
+version = 7.x-1.0-alpha
+
+
+files[] = whywebs_drupal_module.install
