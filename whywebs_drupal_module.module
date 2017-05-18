@@ -1,0 +1,330 @@
+<?php
+/**
+ * @file
+ * All functionalities for the whywebs Community timeline page.
+ */
+module_load_include('inc', 'pathauto'); // include the inc file for Pathauto module
+define('whywebs_drupal_module_DEFAULT_FILES', 1);
+
+
+function segment_explorer_permission() {
+  return array(
+    'Build a new module' => array(
+      'title' => t('WhyWebs - Build a new module'),
+      'description' => t('Performs access to Build a new module'),
+    ),
+  );
+}
+/**
+ * Implements hook_menu().
+ */
+function whywebs_drupal_module_menu() {
+  $items = array();
+
+  $items['drupal/new-module'] = array(
+    'title' => 'Build a new Drupal module',
+    'page callback' => 'whywebs_drupal_module_submit',
+    'access arguments' => array('access content'),
+    'cache' => DRUPAL_NO_CACHE
+  );
+
+  return $items;
+}
+
+/**
+ * Implements hook_block_info().
+ */
+function whywebs_drupal_module_block_info() {
+  $blocks['whywebs-drupal-modules'] = array(
+    'info' => t('Build your drupal module'),
+    'cache' => DRUPAL_NO_CACHE
+  );
+
+  return $blocks;
+}
+
+/**
+ * Implements hook_block_view().
+ */
+function whywebs_drupal_module_block_view($delta = '') {
+  $block = array();
+
+  switch ($delta) {
+    case 'whywebs-drupal-modules':
+      $block['content'] = drupal_get_form('whywebs_drupal_module_submit');
+      break;
+  }
+  return $block;
+}
+
+
+function whywebs_drupal_module_empty_page($form, &$form_state){
+  $form = array();
+  return $form;
+}
+
+/**
+ * Form for the 'whywebs-drupal-modules' block.
+ */
+function whywebs_drupal_module_submit($form, &$form_state) {
+  $form = array();
+
+  // Retrieve my group.
+  global $user;
+    $account = user_load($user->uid);
+  if (!isset($user->og_user_node)) {
+    $account = user_load($user->uid);
+  }
+  else {
+    $account = $user;
+  }
+  if(isset($user->uid)){
+     $owner_name = $user->mail;
+  }else{
+     $owner_name = t('Your Name or Email here'); 
+  } 
+
+  //recep box to add new users
+  $form['module_info'] = array(
+    '#type' => 'container',
+    '#attributes' => array(
+      'id' => 'whywebs-drupal-modules-form',
+    )
+  );
+  $form['module_info']['module_name'] = array(
+    '#type' => 'textfield',
+    '#attributes' => array(
+       'id' => 'module-name',
+      'placeholder' => t('Module Name'),
+    ),
+  );
+
+//
+  $form['module_info']['module_owner_name'] = array(
+    '#type' => 'textfield',
+    '#attributes' => array(
+       'id' => 'module-owner-name',
+       'placeholder' => $owner_name,
+    ),
+  );
+
+  $form['module_info']['description'] = array(
+    '#type' => 'textarea',
+    '#rows' => 5,
+    '#resizable' => FALSE,
+    '#required' => TRUE,
+    '#attributes' => array(
+      'id' => 'description',
+      'placeholder' => t('Your module description here.'),
+    )
+  );
+
+  ///Info file info
+  $form['module_info']['module_file_name'] = array(
+    '#type' => 'textfield',
+    '#attributes' => array(
+      'id' => 'info-file-name',
+      'placeholder' => t('Module Module file name here.'),
+    ),
+  );
+
+  $form['module_info']['module_file'] = array(
+    '#type' => 'textarea',
+    '#rows' => 5,
+    '#resizable' => FALSE,
+    '#required' => TRUE,
+    '#attributes' => array(
+      'id' => 'info-file',
+      'placeholder' => t('Module Module file name here.'),
+    )
+  );
+
+  ///Info file info
+  $form['module_info']['info_file_name'] = array(
+    '#type' => 'textfield',
+    '#attributes' => array(
+      'id' => 'info-file-name',
+      'placeholder' => t('Module Info file name here.'),
+    ),
+  );
+
+  $form['module_info']['info_file'] = array(
+    '#type' => 'textarea',
+    '#rows' => 5,
+    '#resizable' => FALSE,
+    '#required' => TRUE,
+    '#attributes' => array(
+      'id' => 'info-file',
+      'placeholder' => t('Module Info file name here.'),
+    )
+  );
+
+  ///install file info
+  $form['module_info']['install_file_name'] = array(
+    '#type' => 'textfield',
+    '#attributes' => array(
+      'id' => 'install-file-name',
+      'placeholder' => t('Module Install file name here.'),
+    ),
+  );
+
+  $form['module_info']['info_file'] = array(
+    '#type' => 'textarea',
+    '#rows' => 5,
+    '#resizable' => FALSE,
+    '#required' => TRUE,
+    '#attributes' => array(
+      'id' => 'install-file',
+      'placeholder' => t('Module Install file name here.'),
+    )
+  );
+  
+  //submit button
+   $form['module_info']['post'] = array(
+    '#type' => 'submit',
+    '#prefix' => '<br>',
+    '#value' => t('Finish'),
+    
+    '#attributes' => array(
+      'id' => 'whywebs-drupal-modules-finish',
+      'visibility' => 'hidden',
+    ),
+  );
+
+
+
+  $form['#attached']['js'] = array(
+    drupal_get_path('module', 'whywebs_drupal_module') . '/whywebs_drupal_module.js',
+  );
+
+  return $form;
+}
+
+/**
+ * Submit callback: For whywebs_drupal_module_submit.
+ */
+function whywebs_drupal_module_submit_submit($form, &$form_state) {
+  global $user;
+  $copyright = '<a href="//whywebs.com" target="_blank">WhyWebs.Com</a>';
+  // Create the basis node object.
+  $node = new stdClass();
+  $node->status = NODE_PUBLISHED;
+  $node->type = 'whywebs_drupal_module';
+  $node->uid = $user->uid;
+  $node->language = LANGUAGE_NONE;
+  $node->comment = COMMENT_NODE_OPEN;
+
+  $node->body = array(
+    LANGUAGE_NONE => array(
+      array(
+        'value' => $form_state['values']['description'],
+        'format' => 'filtered_html',
+      )
+    )
+  );
+
+  $node->field_description = array(
+    LANGUAGE_NONE => array(
+      array(
+        'value' => $form_state['values']['description'],
+        'format' => 'filtered_html',
+      )
+    )
+  );
+
+  $node->field_info_file = array(
+    LANGUAGE_NONE => array(
+      array(
+        'value' => $form_state['values']['info_file'],
+        'format' => 'module_html',
+      )
+    )
+  );
+
+  $node->field_install_file = array(
+    LANGUAGE_NONE => array(
+      array(
+        'value' => $form_state['values']['install_file'],
+        'format' => 'module_html',
+      )
+    )
+  );
+
+  $node->field_module_file = array(
+    LANGUAGE_NONE => array(
+      array(
+        'value' => $form_state['values']['module_file'],
+        'format' => 'module_html',
+      )
+    )
+  );
+
+  
+  // Set title.
+  $title = htmlspecialchars_decode($form_state['values']['module_name']);
+  $title = preg_replace('/[\t\n\r\0\x0B]/', '', strip_tags($title));
+  $node->title = truncate_utf8($title, 30, TRUE, TRUE);
+  $node->field_module_name = truncate_utf8($title, 30, TRUE, TRUE);
+  $file_name = htmlspecialchars_decode($form_state['values']['module_name']);
+  $file_name1 = preg_replace('/[\t\n\r\0\x0B]/', ' ', strip_tags($title));
+  $file_name2 = preg_replace(' ', '', strip_tags($file_name1));
+  $node->field_info_file_name = strtolower($file_name2) . '.info';
+  $node->field_module_file_name = strtolower($file_name2) . '.module';
+  $node->field_install_file_name = strtolower($file_name2) . '.install';
+
+
+
+  node_save($node);
+
+  foreach ($files as $file) {
+    // Record that the file is being used by the node.
+    file_usage_add($file, 'file', 'node', $node->nid);
+  }
+
+  drupal_set_message('Your module ready to go, enjoy it and please share. Powered by: '  . $copyright);
+}
+
+
+
+
+
+
+/**
+ * Implements hook_ds_pre_render_alter().
+ */
+function whywebs_drupal_module_ds_pre_render_alter(&$layout_render_array, $context, &$vars) {
+  $entity_type = $context['entity_type'];
+  if ($entity_type == 'node' && $layout_render_array['left'][0]['#field_name'] == 'post_owner') {
+    $user = user_load($layout_render_array['left'][0]['#object']->uid);
+    $data_array = array($user->mail);
+
+    if (isset($user->field_job_title[LANGUAGE_NONE][0]['value'])) {
+      $data_array[] = $user->field_job_title[LANGUAGE_NONE][0]['value'];
+    }
+
+    if (isset($user->field_current_company[LANGUAGE_NONE][0]['value'])) {
+      $data_array[] = $user->field_current_company[LANGUAGE_NONE][0]['value'];
+    }
+
+    $layout_render_array['left'][0][0]['#markup'] = implode(', ', $data_array);
+  }
+}
+
+// /**
+//  * Implements hook_views_pre_render().
+//  */
+// function whywebs_drupal_module_views_pre_render(&$view) {
+//   $results = &$view->result;
+//   foreach ($results as $key => $result) {
+//     if ($view->name == 'drupal') {
+//       $view->field['nothing']->options['alter']['text'] = '
+//       <div id="drupal-titles">
+//       <input class="drupal" name=[nid] type="checkbox" >
+//       <label name=[nid]>[name] - [created]</label>
+//       </div>
+//       <div id="drupal-body">[body]</div>
+//       ';
+//     }    
+//   }
+// }
+

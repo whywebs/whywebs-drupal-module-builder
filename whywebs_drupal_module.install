@@ -1,0 +1,344 @@
+<?php
+
+
+function whywebs_drupal_module_install() {
+  $t = get_t();
+  $whywebs_drupal_module = array(
+    'type' => 'whywebs_drupal_module',
+    'name' => $t('Whywebs Drupal Module'),
+    'base' => 'node_content',
+    'description' => $t('Node type just for  whywebs_drupal_module'),
+    'body_label' => $t('General Info')
+  );
+  $content_type = node_type_set_defaults($whywebs_drupal_module);
+  node_add_body_field($content_type);
+
+// Check if we create content type or update.
+  $status = node_type_save($content_type);
+
+ //add custom fields that needed for all modules
+ whywebs_drupal_module_text_format();
+ whywebs_drupal_module_add_custom_fields();
+
+
+}
+
+
+function whywebs_drupal_module_add_custom_fields() {
+    foreach (whywebs_drupal_module_fields() as $field) {
+        field_create_field($field);
+    }
+    foreach (whywebs_drupal_module_instances() as $fieldinstance) {
+        $fieldinstance['entity_type'] = 'node';
+        $fieldinstance['bundle'] = 'whywebs_drupal_module';
+        field_create_instance($fieldinstance);
+    }
+}
+
+function whywebs_drupal_module_fields() {
+// Replacement rule for the messages.
+  $t_args = get_t();
+
+	return array(
+	
+		// Module Owner name
+ 
+		'module_owner_name'	=> array(
+		
+			'field_name'   => 'module_owner_name',
+			'type'         => 'text',
+			'cardinality'  => 1,
+		),
+ 
+		// Module Name
+ 
+		'module_name'	=> array(
+		
+			'field_name'   => 'module_name',
+			'type'         => 'text_long',
+			'cardinality'  => 1,
+ 
+		),
+
+		// Description
+ 
+		'description'	=> array(
+		
+			'field_name'   => 'description',
+			'type'         => 'text_long',
+			'cardinality'  => 1,
+ 
+		),
+
+		// *.info file
+
+		'info_file_name'	=> array(
+		
+			'field_name'   => 'info_file_name',
+			'type'         => 'text',
+			'cardinality'  => 1,
+
+		),
+ 
+		'info_file'	=> array(
+		
+			'field_name'   => 'info_file',
+			'type'         => 'text_long',
+			'cardinality'  => 1,
+ 
+		),
+
+		// *.Module File
+
+		'module_file_name'	=> array(
+		
+			'field_name'   => 'module_file_name',
+			'type'         => 'text',
+			'cardinality'  => 1,
+
+		),
+
+ 
+		'module_file'	=> array(
+		
+			'field_name'   => 'module_file',
+			'type'         => 'text_long',
+			'cardinality'  => 1,
+
+		),
+
+
+		// *.Module File
+
+		'install_file_name'	=> array(
+		
+			'field_name'   => 'install_file_name',
+			'type'         => 'text',
+			'cardinality'  => 1,
+
+		),
+
+ 
+		'install_file'	=> array(
+		
+			'field_name'   => 'install_file',
+			'type'         => 'text_long',
+			'cardinality'  => 1,
+
+		),
+
+
+	);
+
+}
+
+
+function whywebs_drupal_module_instances() {
+	$t = get_t();
+	return array(
+	
+		// Module name
+ 
+		'module_name'	=> array(
+		
+			'field_name'   => 'module_name',
+			'label'        => $t('Module Name'),
+			'required'     => TRUE,
+			'widget'       => array(
+				'type'	=> 'text_textfield'
+			),
+ 
+		),
+
+		// Module Owner name
+
+		'module_owner_name'	=> array(
+		
+			'field_name'   => 'module_owner_name',
+			'label'        => $t('Module Owner Name'),
+			'required'     => TRUE,
+			'widget'       => array(
+				'type'	=> 'text_textfield'
+			),
+ 
+		),
+ 
+		// Description
+ 
+		'description'	=> array(
+		
+			'field_name'   => 'description',
+			'label'        => $t('About this module'),
+			'required'     => TRUE,
+			'widget'       => array(
+				'type'	=> 'text_textarea'
+			),
+		),
+
+		// *.info file
+
+		'info_file_name'	=> array(
+		
+			'field_name'   => 'info_file_name',
+			'label'        => $t('*.info file name'),
+			'required'     => TRUE,
+			'widget'       => array(
+				'type'	=> 'text_textfield'
+			),
+
+		),
+ 
+		'info_file'	=> array(
+		
+			'field_name'   => 'info_file',
+			'label'        => $t('*.info file'),
+			'required'     => TRUE,
+			'widget'       => array(
+				'type'	=> 'text_textarea'
+			),
+ 
+		),
+
+		// *.Module File
+
+		'module_file_name'	=> array(
+		
+			'field_name'   => 'module_file_name',
+			'label'        => $t('*.module file name'),
+			'required'     => TRUE,
+			'widget'       => array(
+				'type'	=> 'text_textfield'
+			),
+
+		),
+
+ 
+		'module_file'	=> array(
+		
+			'field_name'   => 'module_file',
+			'label'        => $t('*.module file'),
+			'required'     => TRUE,
+			'widget'       => array(
+				'type'	=> 'text_textarea'
+			),
+
+		),
+
+
+		// *.Module File
+
+		'install_file_name'	=> array(
+		
+			'field_name'   => 'install_file_name',
+			'label'        => $t('*.install file name'),
+			'required'     => TRUE,
+			'widget'       => array(
+				'type'	=> 'text_textfield'
+			),
+
+		),
+
+ 
+		'install_file'	=> array(
+		
+			'field_name'   => 'description',
+			'label'        => $t('*.install file'),
+			'required'     => TRUE,
+			'widget'       => array(
+				'type'	=> 'text_textarea'
+			),
+
+		),
+ 
+	);
+
+}
+
+function whywebs_drupal_module_text_format() {
+
+  $query = db_select('role', 'r');
+  $query->fields('r', array('rid', 'name'));
+  $query->orderBy('weight');
+  $query->orderBy('name');
+  $result = $query->execute();
+  $roles = array();
+  foreach ($result as $role) {
+    switch ($role->rid) {
+      // We only translate the built in role names
+      case DRUPAL_ANONYMOUS_RID:
+        if (!$membersonly) {
+          $roles[$role->rid] = t($role->name);
+        }
+        break;
+      case DRUPAL_AUTHENTICATED_RID:
+        $roles[$role->rid] = t($role->name);
+        break;
+      default:
+        $roles[$role->rid] = $role->name;
+    }
+  }
+ 
+  $format_exists = (bool) db_query_range('SELECT 1 FROM {filter_format} WHERE name = :name', 0, 1, array(':name' => 'module_html'))->fetchField();
+ 
+if (!$format_exists) {
+  // Define allowed tags.
+  $allowed_tags = [
+    'grouping' => '<p> <hr> <pre> <blockquote> <ol> <ul> <li> <dl> <dt> <dd> <figure> <figcaption> <div> <main> <table> <?php ?> <a> <body>',
+    'others' => '<source>',
+  ];
+ 
+	  $format = [
+	    'format' => 'module_html',
+	    'name' => 'module_html',
+	    // be the default format for anyone.
+	    'weight' => 15,
+	    'filters' => [
+	      // Allowed HTML tags.
+	      'filter_html' => [
+	        'status' => 1,
+	        'weight' => 4,
+	        'settings' => [
+	          'allowed_html' => implode(' ', $allowed_tags),
+	          'filter_html_help' => 0,
+	          'filter_html_nofollow' => 0,
+	        ],
+	      ],
+	    ],
+	  ];
+	 
+	  // Prepare and save the text format.
+	  $format = (object) $format;
+	  filter_format_save($format);
+
+	}
+}
+
+/**
+ * Implements hook_uninstall().
+ */
+function whywebs_drupal_module_uninstall()
+{
+	$whywebs_node = 'whywebs_drupal_module';
+    $sql = 'SELECT nid FROM {node} n WHERE n.type = :type';
+    $result = db_query($sql, array(':type' => $whywebs_node));
+    $nodeids = array();
+    foreach ($result as $row) {
+        $nodeids[] = $row->nid;
+    }
+    node_delete_multiple($nodeids);
+    whywebs_drupal_module_fields_delete();
+    node_type_delete($whywebs_node);
+    field_purge_batch(500);
+}
+
+function whywebs_drupal_module_fields_delete() {
+    foreach (array_keys(whywebs_drupal_module_fields()) as $field) {
+        field_delete_field($field);
+    }
+
+$instances = field_info_instances('node', 'whywebs_drupal_module');
+    foreach ($instances as $instance_name => $fieldinstance) {
+        field_delete_instance($fieldinstance);
+    }
+ 
+}
